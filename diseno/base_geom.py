@@ -34,7 +34,18 @@ WALL_IN = 3.0                   # las paredes quedan 3 mm hacia adentro del bord
 FRONT_TABS = (-45.0, 0.0, 45.0)     # centros de lenguetas de las paredes frontal/trasera (largo 20)
 SIDE_TABS = (-40.0, 0.0, 40.0)      # idem paredes laterales
 TAB_LEN = 20.0
-SKIDS = [(sx * 35.0, sy * 35.0, 3.2) for sx in (-1, 1) for sy in (-1, 1)]
+# 4 ruedas = rodamientos 693 (d3 x D8 x 4) con eje M3 radial, a R=51 sobre los ejes x/y; ruedan en la pista circular de la placa superior
+WHEEL_R = 51.0
+WHEELS = [(WHEEL_R, 0.0, "x"), (-WHEEL_R, 0.0, "x"), (0.0, WHEEL_R, "y"), (0.0, -WHEEL_R, "y")]   # (x, y, direccion del eje)
+WHEEL_D, WHEEL_W = 8.0, 4.0
+WHEEL_Z = Z_TOP[1] + WHEEL_D / 2          # centro del eje: la rueda toca la placa (z -11) y roza la torreta (z -3)
+EAR_GAP = 4.4                             # entre orejas (rodamiento 4 mm + holgura)
+EAR_Z0 = -10.5                            # las orejas quedan 0.5 mm sobre la placa
+EAR_TAB_HALF, EAR_HALF = 5.0, 6.0         # media anchura de la lengueta y de la oreja
+# seguros impresos en 3D del eje (tornillo M3x16 de cabeza boton + tuerca autofrenante, ver impresion_3d/)
+CAP_OD, CAP_T, CAP_FLOOR = g.CAP_OD, g.CAP_T, g.CAP_FLOOR     # seguro unico (ver shoulder_geom)
+WHEEL_BOLT_L = 14.0                       # tornillo M3 x 14 del eje: cabeza sobre el piso del seguro, punta al ras del otro seguro
+SHIM_OD, SHIM_ID, SHIM_T = 4.4, 3.2, 0.2  # arandela de la pista interior: 2 por rodamiento, dejan el rodamiento libre entre las orejas
 CORNER = 60.0
 
 
@@ -103,7 +114,7 @@ def turret_disc():
 def turret_holes():
     hs = [(0.0, 0.0, g.CENTER_A)]
     hs += [(g.HORN_R * math.cos(math.radians(45 + 90 * k)), g.HORN_R * math.sin(math.radians(45 + 90 * k)), g.HORN_D) for k in range(4)]
-    return hs + SKIDS + [CABLE_PASS]
+    return hs + [CABLE_PASS]
 
 
 def turret_slots():
@@ -112,6 +123,32 @@ def turret_slots():
         r.append((a, g.Y_C, b + SLOT, g.Y_C + T + SLOT))                       # mejilla derecha (y>0)
         r.append((a, -g.Y_C - T - SLOT, b + SLOT, -g.Y_C))                     # mejilla izquierda
     return r
+
+
+def wheel_ear():
+    """oreja de rueda en coordenadas (u tangencial, v=z): cuelga de la torreta; lengueta de 3 mm al ras de la tapa."""
+    h, w = EAR_HALF, EAR_TAB_HALF
+    return [(-h, EAR_Z0), (h, EAR_Z0), (h, Z_TURRET[0]), (w, Z_TURRET[0]), (w, Z_TURRET[1]), (-w, Z_TURRET[1]), (-w, Z_TURRET[0]), (-h, Z_TURRET[0])]
+
+
+def wheel_ear_holes():
+    return [(0.0, WHEEL_Z, 3.2)]
+
+
+def wheel_cuts():
+    """un hueco por rueda en la torreta: recibe las 2 lenguetas y deja libre el borde superior del rodamiento."""
+    r = []
+    a = EAR_GAP / 2 + T + SLOT
+    for (x, y, ax) in WHEELS:
+        if ax == "x":
+            r.append((x - a, y - EAR_TAB_HALF - SLOT / 2, x + a, y + EAR_TAB_HALF + SLOT / 2))
+        else:
+            r.append((x - EAR_TAB_HALF - SLOT / 2, y - a, x + EAR_TAB_HALF + SLOT / 2, y + a))
+    return r
+
+
+def turret_cuts():
+    return turret_slots() + wheel_cuts()
 
 
 def brace_plate():
@@ -129,9 +166,9 @@ GRIP_REACH = GOFF + 66.0 - e.L2             # desde el extremo del antebrazo has
 
 
 def gripper_plate():
-    h = gr.PLATE["y1"]
-    return [(NECK_X0, -NECK_HW), (PLATE_X0, -NECK_HW), (PLATE_X0, -h), (gr.PLATE["x1"], -h), (gr.PLATE["x1"], h),
-            (PLATE_X0, h), (PLATE_X0, NECK_HW), (NECK_X0, NECK_HW)]
+    y0, y1 = gr.PLATE["y0"], gr.PLATE["y1"]
+    return [(NECK_X0, -NECK_HW), (PLATE_X0, -NECK_HW), (PLATE_X0, y0), (gr.PLATE["x1"], y0), (gr.PLATE["x1"], y1),
+            (PLATE_X0, y1), (PLATE_X0, NECK_HW), (NECK_X0, NECK_HW)]
 
 
 def gripper_plate_holes():

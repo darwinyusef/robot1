@@ -41,11 +41,11 @@ def elbow(sc, theta, psi):
     ex, ez = e.elbow_pt(theta)
     u = math.radians(psi + 180.0)
     sx = e.pt_forearm(theta, psi, e.SPACER_X)
-    sc.cyl("pasador_codo", 3.0, -13.0, 16.5, ex, ez, "#b8bec6")
+    sc.bolt_y("pasador_codo", ex, ez, e.Y_FA_R[1], e.Y_FA_L[0])
     sc.cyl("pasador_manivela", 3.0, -13.0, -5.2, e.RC * math.cos(u), g.H + e.RC * math.sin(u), "#b8bec6")
     sc.cyl("pasador_palanca", 3.0, -13.0, -5.2, ex + e.RC * math.cos(u), ez + e.RC * math.sin(u), "#b8bec6")
     sc.cyl("tubo_separador", 6.0, -9.0, 12.5, sx[0], sx[1], "#e0d0b0")
-    sc.cyl("perno_separador", 3.0, -13.0, 16.5, sx[0], sx[1], "#b8bec6")
+    sc.bolt_y("perno_separador", sx[0], sx[1], e.Y_FA_R[1], e.Y_FA_L[0])
 
 
 def run_3d():

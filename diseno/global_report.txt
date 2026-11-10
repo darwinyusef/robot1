@@ -48,26 +48,26 @@ mapa (cada celda 20 mm; # = alguna punta; fila superior = z alto). r de 0 a 260:
 
 3. PAR POR ARTICULACION (estatica con masas reales de las piezas; maximo sobre todas las poses factibles)
    rendimiento: engranes 0.9, biela 0.9; pinza SG90; J2/J3 comparados con SG90 y MG90S (limite recomendado 60 % del par de bloqueo)
-carga  0 g: J2 0.22 kg*cm (theta=5, psi=-30) -> SG90 12%  MG90S 10%
-            J3 0.37 kg*cm (theta=65, psi=0) -> SG90 20%  MG90S 17%
+carga  0 g: J2 0.21 kg*cm (theta=5, psi=-30) -> SG90 11%  MG90S 9%
+            J3 0.34 kg*cm (theta=65, psi=0) -> SG90 19%  MG90S 15%
 carga 20 g: J2 0.31 kg*cm (theta=5, psi=-30) -> SG90 17%  MG90S 14%
-            J3 0.74 kg*cm (theta=85, psi=0) -> SG90 41%  MG90S 34%
-carga 50 g: J2 0.46 kg*cm (theta=5, psi=-30) -> SG90 26%  MG90S 21%
-            J3 1.31 kg*cm (theta=65, psi=0) -> SG90 73%  MG90S 60%
-masa en el antebrazo + pinza + carga 50 g: 88 g;  brazo (3 capas) 15.4 g;  manivela+media biela 1.9 g
--> con 50 g: MG90S J2 21% / J3 60% (ok <60%); con SG90 J3 seria 73% (NO pasa)
+            J3 0.72 kg*cm (theta=85, psi=0) -> SG90 40%  MG90S 33%
+carga 50 g: J2 0.45 kg*cm (theta=5, psi=-30) -> SG90 25%  MG90S 21%
+            J3 1.28 kg*cm (theta=65, psi=0) -> SG90 71%  MG90S 58%
+masa en el antebrazo + pinza + carga 50 g: 86 g;  brazo (3 capas) 15.4 g;  manivela+media biela 1.9 g
+-> con 50 g: MG90S J2 21% / J3 58% (ok <60%); con SG90 J3 seria 71% (NO pasa)
 carga maxima con MG90S bajo el 60 %: 50 g (barrido 20/35/50/65/80 g)
 carga maxima con SG90 en J3 bajo el 60 %: 30 g
 
-4. BIELA: fuerza maxima 14.0 N (|sin rel| >= 0.57), pandeo de Euler 74 N -> FS 5.3
+4. BIELA: fuerza maxima 13.7 N (|sin rel| >= 0.57), pandeo de Euler 74 N -> FS 5.4
 
 5. J1 (guinada) y VUELCO DE LA TORRETA (patines a +-35 mm; la torreta esta sujeta al cuerno del J1 en el centro)
-fuerza de arranque en el centro (peor caso): 3.3 N = 337 gf   (carga 50 g, theta=20, psi=-15, de frente; masa total 194 g)
+fuerza de arranque en el centro (peor caso): 3.2 N = 328 gf   (carga 50 g, theta=20, psi=-15, de frente; masa total 193 g)
   -> el tornillo central del cuerno del J1 debe sujetar la torreta; la salida del servo (SG90/MG90S) soporta cargas axiales de ese orden, pero no es un cojinete
   flexion del disco de la torreta junto al cuerno: ~1.9 MPa (MDF ~20 MPa)
-inercia de J1 respecto del eje: 2.02e-04 (replegado, sin carga) .. 4.28e-03 kg*m2 (extendido, 50 g);  friccion de patines ~0.29 kg*cm (mu=0.3, 194 g)
-  SG90: aceleracion angular admisible al 60 % = 18 rad/s2 -> barrido de 180 deg en >= 0.83 s (extendido, 50 g)
-  MG90S: aceleracion angular admisible al 60 % = 24 rad/s2 -> barrido de 180 deg en >= 0.73 s (extendido, 50 g)
+inercia de J1 respecto del eje: 1.88e-04 (replegado, sin carga) .. 4.20e-03 kg*m2 (extendido, 50 g);  friccion de patines ~0.29 kg*cm (mu=0.3, 193 g)
+  SG90: aceleracion angular admisible al 60 % = 19 rad/s2 -> barrido de 180 deg en >= 0.82 s (extendido, 50 g)
+  MG90S: aceleracion angular admisible al 60 % = 24 rad/s2 -> barrido de 180 deg en >= 0.72 s (extendido, 50 g)
 
 6. PINZA
   SG90: fuerza en las almohadillas ~3.8 N por mandibula (radio 42 mm); sujetar 50 g con mu=0.4 necesita 0.6 N -> FS 6

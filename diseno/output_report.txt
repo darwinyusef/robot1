@@ -1,4 +1,4 @@
-FASE 6 - SALIDA   plancha 350 x 350 mm, MDF 3 mm, margen 6, separacion 4
+FASE 6 - SALIDA   plancha 400 x 400 mm, MDF 3 mm, margen 6, separacion 4
 
 pieza                 cant  caja (mm)         area (mm2)  puente contorno-hueco  puente hueco-hueco
 PLACA BRAZO DER         1   131.7 x  47.5        3216            10.37            86.80
@@ -13,18 +13,19 @@ ANTEBRAZO IZQ           1   110.5 x  16.0        1393             2.88          
 ANTEBRAZO DER           1    98.0 x  16.0        1284             5.40            36.80
 PLACA SUPERIOR          1   140.0 x 140.0       19600             3.00             1.05  (excepcion documentada: puente servo-ventana/tornillo 1.05 mm >= 1.0)
 PLACA INFERIOR          1   140.0 x 140.0       19600             3.00             4.27
-TORRETA                 1   120.0 x 120.0       11305             8.91             3.36
+TORRETA                 1   120.0 x 120.0       11305             3.46             3.36
+OREJA DE RUEDA          8    12.0 x  10.5         120             1.90            99.00
 TRAVESANO               1    46.0 x  20.0         920            99.00            99.00
 PARED FRONTAL           1   134.0 x  22.0        2504            99.00            99.00
 PARED TRASERA           1   134.0 x  22.0        2504             6.00            99.00
 PARED LATERAL           2   128.0 x  22.0        2408            99.00            99.00
-PLACA PINZA+CUELLO      1    76.0 x  52.0        3266             3.60             1.05  (excepcion documentada: puente servo-ventana/tornillo 1.05 mm >= 1.0)
+PLACA PINZA+CUELLO      1    63.0 x  47.0        2415             1.45             1.05  (excepcion documentada: puente servo-ventana/tornillo 1.05 mm >= 1.0)
 MANDIBULA A             2    65.3 x  29.2         850             2.59             3.32
 MANDIBULA B             2    67.1 x  29.2         849             9.63            99.00
 
-24 piezas, area de las piezas 91109 mm2 (37 % de 2 plancha(s) de 350x350)
-  plancha 1: 10 piezas -> corte_final_mdf_3mm_1.svg
-  plancha 2: 14 piezas -> corte_final_mdf_3mm_2.svg
+32 piezas, area de las piezas 91218 mm2 (29 % de 2 plancha(s) de 400x400)
+  plancha 1: 14 piezas -> corte_final_mdf_3mm_1.svg
+  plancha 2: 18 piezas -> corte_final_mdf_3mm_2.svg
 
 tabla de limites (theta: psi_min..psi_max) -> brazo_v2/limites.h
   5:-30..-30  10:-35..-25  15:-35..-20  20:-40..-15  25:-40..-10  30:-45..-5  35:-50..0  40:-50..5  45:-55..10  50:-60..15  55:-65..20  60:-65..25  65:-65..30  70:-60..35  75:-60..40  80:-55..45  85:-50..50

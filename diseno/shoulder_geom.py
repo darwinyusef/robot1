@@ -16,6 +16,10 @@ sys.path.insert(0, HERE)                       # python -I no agrega la carpeta 
 from gripper import rot, shift, area, inside, overlap_area, min_dist, inv   # noqa: E402
 
 T = 3.0
+CAP_OD, CAP_T, CAP_FLOOR = 7.6, 2.0, 0.4      # seguro unico impreso en 3D (igual para cabeza y tuerca), 2 mm; la tuerca (2.4) sobresale 0.8
+CAP_AF, CAP_HOLE = 5.8, 3.4                   # bolsillo hexagonal (cabeza boton M3 O5.7 o tuerca M3 llave 5.5) y paso del tornillo
+HEAD_T, NUT_T = 1.65, 2.4                     # cabeza boton M3 / tuerca M3 estandar
+PIN_L = 35.0                                  # tornillo M3 x 35 para los pasadores del brazo
 M, Z1, Z2 = 2.0, 14, 28
 PA, BACKLASH = 20.0, 0.10
 ADD, DED = 0.85 * M, 1.25 * M

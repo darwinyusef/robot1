@@ -33,7 +33,11 @@ def body_points():
     cy = e.FA_YC
     body = grid(e.L2 - 4, e.L2 + 50, cy - 26, cy + 26, -18, 13)
     jaws = grid(e.L2 + 50, e.L2 + b.GRIP_REACH, cy - 36, cy + 36, -4, 4)
-    return np.vstack([fa, body, jaws])
+    # seguros y puntas de los pasadores del codo y del separador (M3 x 35, seguros O7.6 x 2), fijos al antebrazo
+    r, yl, yr = g.CAP_OD / 2, e.Y_FA_R[1] + g.CAP_FLOOR - g.PIN_L, e.Y_FA_R[1] + g.CAP_T
+    pins = [grid(lx - r, lx + r, yl, e.Y_FA_L[0], -r, r, 2.0) for lx in (0.0, e.SPACER_X)] + \
+           [grid(lx - r, lx + r, e.Y_FA_R[1], yr, -r, r, 2.0) for lx in (0.0, e.SPACER_X)]
+    return np.vstack([fa, body, jaws] + pins)
 
 
 def inpoly(pts, poly):
@@ -125,15 +129,22 @@ def main():
     ok &= -clr_bot > 1.0
     # lenguetas de la oreja en la placa y agujeros de la torreta
     th = b.turret_holes()
-    for nm, (u, v, d) in (("patin", (35, 35, 6.4)), ):
-        pass
+    tp_h, tp_r = b.top_plate()[1], b.top_plate()[2]
     dmin = 1e9
-    for (hx, hy, hd) in b.SKIDS:
-        for (a0, b0, a1, b1) in [b.j1_window()]:
-            dx = max(a0 - hx, 0, hx - a1); dy = max(b0 - hy, 0, hy - b1)
-            dmin = min(dmin, math.hypot(dx, dy) - hd / 2)
-    log("  patines: distancia minima a la ventana %.1f mm (los patines ruedan sobre la placa superior)" % dmin)
+    for a in np.linspace(0, 2 * math.pi, 720):
+        px, py = b.WHEEL_R * math.cos(a), b.WHEEL_R * math.sin(a)
+        for (hx, hy, hd) in tp_h:
+            dmin = min(dmin, math.hypot(px - hx, py - hy) - hd / 2 - b.WHEEL_W / 2)
+        for (a0, b0, a1, b1) in tp_r:
+            dx = max(a0 - px, 0, px - a1); dy = max(b0 - py, 0, py - b1)
+            dmin = min(dmin, math.hypot(dx, dy) - b.WHEEL_W / 2)
+    log("  ruedas: la pista R=%.0f queda a %.1f mm del agujero o ranura mas cercano de la placa superior" % (b.WHEEL_R, dmin))
     ok &= dmin > 3
+    for (hx, hy, ax), cut in zip(b.WHEELS, b.wheel_cuts()):
+        far = math.hypot(max(abs(cut[0]), abs(cut[2])), max(abs(cut[1]), abs(cut[3])))
+        near = min(math.hypot(max(cut[0] - cx, 0, cx - cut[2]), max(cut[1] - cy, 0, cy - cut[3])) - cd / 2 for (cx, cy, cd) in b.turret_holes())
+        ok &= far < b.TURRET_R - 1.0 and near > 3
+        log("  rueda (%+.0f,%+.0f) eje %s: hueco hasta r=%.1f (torreta R=%.0f), a %.1f mm del agujero mas cercano" % (hx, hy, ax, far, b.TURRET_R, near))
 
     # --- 3. encaje de lenguetas
     slots = b.wall_slots()

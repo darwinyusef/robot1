@@ -5,21 +5,25 @@ BASE v2 (fase 4)   placas 140x140  torreta r=60  mesa z=-33 (tapa de la torreta 
   contorno pared fr/tr  puntos= 28 area=  2504.0 mm2 simple=True
   contorno pared lat.   puntos= 28 area=  2408.0 mm2 simple=True
   contorno travesano    puntos=  4 area=   920.0 mm2 simple=True
-  contorno placa pinza  puntos=  8 area=  3266.0 mm2 simple=True
+  contorno placa pinza  puntos=  8 area=  2415.0 mm2 simple=True
 
 servo J1 vertical: ventana -17.1..6.3 x -6.4..6.4 mm, cuerpo z -26.9..-4.2, orejas z -11.0..-8.5 sobre la placa superior (z tope -11.0)
   ventana en caja: True
   holgura cuerpo-placa inferior: 3.1 mm   cuerno apoyado bajo la torreta (z -4..-3), eje del servo asoma 0.2 mm sobre el cuerpo
-  patines: distancia minima a la ventana 32.1 mm (los patines ruedan sobre la placa superior)
+  ruedas: la pista R=51 queda a 10.9 mm del agujero o ranura mas cercano de la placa superior
+  rueda (+51,+0) eje x: hueco hasta r=56.5 (torreta R=60), a 39.1 mm del agujero mas cercano
+  rueda (-51,+0) eje x: hueco hasta r=56.5 (torreta R=60), a 12.7 mm del agujero mas cercano
+  rueda (+0,+51) eje y: hueco hasta r=56.5 (torreta R=60), a 39.1 mm del agujero mas cercano
+  rueda (+0,-51) eje y: hueco hasta r=56.5 (torreta R=60), a 39.1 mm del agujero mas cercano
 
 ranuras de pared: 12 por placa; lenguetas 20 mm de largo, ranura 20.1 x 3.1 mm (holgura 0.1)
-ranuras de mejilla en la torreta: 4, separacion minima a otros agujeros 10.3 mm
+ranuras de mejilla en la torreta: 4, separacion minima a otros agujeros 13.4 mm
 travesano: 46 x 20 mm, en x 20..23, atraviesa ranuras de ambas mejillas
 
-puente de la pinza: cuello x -52..-24 mm y +-13.75 mm (ranura del antebrazo 3.1 mm abierta al frente) -> placa de la pinza x -24..24
+puente de la pinza: cuello x -52..-24 mm y +-13.75 mm (ranura del antebrazo 3.1 mm abierta al frente) -> placa de la pinza x -24..11
   cuello se inserta 26 mm en las ranuras del antebrazo; alcance total desde el codo = L2 + 92 = 182 mm
 
-colisiones 3D (3534 puntos de muestreo): antebrazo + pinza contra mesa/torreta/base (todas las guinadas) y mejillas/travesano/servos (plano del brazo)
+colisiones 3D (3884 puntos de muestreo): antebrazo + pinza contra mesa/torreta/base (todas las guinadas) y mejillas/travesano/servos (plano del brazo)
 theta  psi permitido (min..max) en el peor caso de guinada; piezas que limitan
     5   -30 ..  -30   (rel  -35 ..  -35)  base,mejilla_der,mejilla_izq,mesa,torreta,travesano
    15   -35 ..  -20   (rel  -50 ..  -35)  base,mejilla_der,mejilla_izq,mesa,torreta,travesano

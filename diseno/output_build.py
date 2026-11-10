@@ -1,4 +1,4 @@
-"""Fase 6 - salida: acomodo de todas las piezas en planchas de MDF 3 mm (350 x 350), SVG con las capas del taller
+"""Fase 6 - salida: acomodo de todas las piezas en planchas de MDF 3 mm (400 x 400), SVG con las capas del taller
 (AZUL = primer corte / interiores, NEGRO = corte final / contornos, ROJO = grabado), control de piezas y de puentes minimos,
 y tabla de limites para el programa.
 
@@ -15,7 +15,7 @@ import elbow_geom as e      # noqa: E402
 import gripper as gr        # noqa: E402
 import base_geom as b       # noqa: E402
 
-BED = (350.0, 350.0)
+BED = (400.0, 400.0)
 MARGIN, GAP, LABEL_H = 6.0, 4.0, 6.0
 MIN_WEB = 1.5
 # Entre la ventana del servo (cuerpo + 0.3 mm) y el tornillo de la oreja del lado del eje queda 1.05 mm de MDF.
@@ -45,7 +45,8 @@ def parts():
         ("ANTEBRAZO DER", 1, e.forearm_right_ply(), e.FA_HOLES_R, []),
         ("PLACA SUPERIOR", 1, b.top_plate()[0], b.top_plate()[1], [rect_poly(r) for r in b.top_plate()[2]]),
         ("PLACA INFERIOR", 1, b.bottom_plate()[0], b.bottom_plate()[1], [rect_poly(r) for r in b.bottom_plate()[2]]),
-        ("TORRETA", 1, b.turret_disc(), b.turret_holes(), [rect_poly(r) for r in b.turret_slots()]),
+        ("TORRETA", 1, b.turret_disc(), b.turret_holes(), [rect_poly(r) for r in b.turret_cuts()]),
+        ("OREJA DE RUEDA", 8, b.wheel_ear(), b.wheel_ear_holes(), []),
         ("TRAVESANO", 1, b.brace_plate(), [], []),
         ("PARED FRONTAL", 1, b.wall_panel(b.WALL_HALF_FRONT, b.FRONT_TABS), [], []),
         ("PARED TRASERA", 1, b.wall_panel(b.WALL_HALF_FRONT, b.FRONT_TABS), b.CABLE_HOLE, []),

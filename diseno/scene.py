@@ -53,6 +53,23 @@ class Scene:
         self.cmd("solid.cylinder", diameter=d, height=y1 - y0, base=[round(x, 4), y0, round(z, 4)], axis="Y", body_name=name)
         self.colors[name] = (color, 1.0)
 
+    def bolt_y(self, name, x, z, y_head, y_nut, length=g.PIN_L):
+        """tornillo M3 sobre el eje Y con 2 seguros unificados: y_head / y_nut = caras donde apoya cada seguro (cabeza hacia y_head)."""
+        s = 1.0 if y_head > y_nut else -1.0
+        rng = lambda a, b: (min(a, b), max(a, b))
+        a, b = rng(y_head, y_head + s * g.CAP_T)
+        self.cyl(name + "_seguro_cabeza", g.CAP_OD, a, b, x, z, "#3b82f6")
+        a, b = rng(y_nut, y_nut - s * g.CAP_T)
+        self.cyl(name + "_seguro_tuerca", g.CAP_OD, a, b, x, z, "#3b82f6")
+        hu = y_head + s * g.CAP_FLOOR                       # cara de apoyo de la cabeza
+        a, b = rng(hu, hu + s * g.HEAD_T)
+        self.cyl(name + "_cabeza", 5.7, a, b, x, z, "#b8bec6")
+        a, b = rng(hu, hu - s * length)
+        self.cyl(name, 3.0, a, b, x, z, "#b8bec6")
+        nu = y_nut - s * g.CAP_FLOOR
+        a, b = rng(nu, nu - s * g.NUT_T)
+        self.cyl(name + "_tuerca", 5.5, a, b, x, z, "#6b7280")
+
     def box(self, name, x0, y0, z0, dx, dy, dz, color):
         self.cmd("solid.box", length=dx, width=dy, height=dz, corner=[round(x0, 4), y0, round(z0, 4)], body_name=name)
         self.colors[name] = (color, 1.0)
@@ -104,4 +121,4 @@ def shoulder(sc, theta, rho_ref, turret=True):
     sc.plate("brazo_der", g.Y_ARM_R[1], g.arm_pose(g.arm_link_ply(), theta), hole_abs(g.ARM_HOLES), color="#3aa0ff")
     sc.plate("brazo_sector", g.Y_SECT[1], g.arm_pose(g.arm_sector_ply(), theta), hole_abs(g.ARM_HOLES[:1]), color="#7cc0ff")
     sc.plate("brazo_izq", g.Y_ARM_L[1], g.arm_pose(g.arm_left_plate(), theta), hole_abs(g.ARM_HOLES), color="#3aa0ff")
-    sc.cyl("perno_S", 3.0, -7.0, 26.0, 0.0, g.H, "#b8bec6")
+    sc.bolt_y("perno_S", 0.0, g.H, g.Y_ARM_L[0] - 0.3, g.Y_C + g.T + 0.3)       # cabeza a la izquierda (el lado derecho queda libre para la punta)

@@ -29,7 +29,10 @@ Cada servo trae su cuerno y tornillos. Usar el cuerno de **1 brazo largo/estrell
 | 1 | Perno M3 x 30 + tuerca + tubo/separador O6 x 21.5 | separador entre las placas del antebrazo |
 | 2 | Pasador M3 x 10 + tuerca | manivela y palanca (extremos de la biela) |
 | 1 | Tornillo M3 x ~22 + separador O6 x 8 | pivote B de la pinza |
-| 4 | Tornillo M3 x 16 + espaciador de nylon 8 mm + tuerca | patines de la torreta |
+| 4 | Rodamiento 693ZZ (3 x 8 x 4 mm) + tornillo M3 x 14 + tuerca M3 (fijarroscas) | ruedas de la torreta: eje radial entre 2 orejas de MDF (8 orejas en total), ruedan en la placa superior; en el eje sobran ~1.5 mm por lado |
+| 20 | Seguro unico impreso en 3D (`impresion_3d/seguro.stl`, O7.6 x 2 mm) | misma pieza para cabeza y tuerca (bolsillo hexagonal 5.8 mm, aloja la cabeza O5.7 o la tuerca M3): 8 en las ruedas, 4 en el codo, 4 en el separador, 4 en el hombro; PLA/PETG 100 % |
+| 3 | Tornillo M3 x 35 + tuerca M3 (fijarroscas) | pasador del codo, perno separador y perno del hombro |
+| 8 | Calzo de rodamiento (impresion 3D, `impresion_3d/calzo_rodamiento.stl`, 0.2 mm) | 2 por rodamiento, dejan libre la pista exterior entre las orejas |
 | 1 | Tornillo M3 pasante (largo para cuerno + torreta) + arandela grande | centro del cuerno J1 (**obligatorio**: la torreta tiende a levantarse 3.3 N con 50 g) |
 | 4 | Tornillos M3 cortos | cuerno J1 a la torreta (4 agujeros) |
 | 8-12 | Tornillos M2 x 8-10 (o los del servo) + tuercas | fijar los 4 servos |

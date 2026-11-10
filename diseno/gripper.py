@@ -249,7 +249,7 @@ def hole_abs(hs, which, phi_deg):
 
 
 # ------------------------------------------------------------------ placa base
-PLATE = dict(x0=-30.0, x1=24.0, y0=-26.0, y1=26.0)
+PLATE = dict(x0=-30.0, x1=11.0, y0=-22.0, y1=25.0)   # justo hasta la oreja del servo (x 10.85) y el pivote B; libre bajo las mandibulas
 BODY_X0, BODY_X1 = -(SV_L - SV_SHAFT_FROM_END), SV_SHAFT_FROM_END        # cuerpo del servo en X
 WIN = (BODY_X0 - 0.3, BODY_X1 + 0.3, PIV - SV_W / 2 - 0.3, PIV + SV_W / 2 + 0.3)
 TAB_X0 = 0.5 * (BODY_X0 + BODY_X1) - SV_TAB_L / 2

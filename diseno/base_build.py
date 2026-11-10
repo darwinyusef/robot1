@@ -42,10 +42,36 @@ def base(sc):
     sc.box("servo_J1_orejas", g.TAB_X0, -g.SV_W / 2, b.Z_TABS[0], g.SV_TAB_L, g.SV_W, g.SV_TAB_T, "#202428")
     sc.zcyl("servo_J1_eje", 4.8, b.Z_BODY_TOP, b.Z_HORN[1], 0, 0, "#b8bec6")
     sc.zcyl("cuerno_J1", 19.0, b.Z_HORN[0], b.Z_HORN[1], 0, 0, "#f2f2f2")
-    for i, (x, y, _) in enumerate(b.SKIDS):
-        sc.zcyl("patin_%d" % i, 6.0, b.Z_TOP[1], b.Z_TURRET[0], x, y, "#f0f0f0")
-        sc.zcyl("patin_tornillo_%d" % i, 3.0, b.Z_TOP[1], b.Z_TURRET[1] + 2, x, y, "#b8bec6")
-    sc.pplate("torreta", (0, 0, b.Z_TURRET[0]), (1, 0, 0), (0, 1, 0), b.turret_disc(), b.turret_holes()[:5] + [b.CABLE_PASS], b.turret_slots(), color="#9a9a9a", opacity=0.55)
+    zw, hg = b.WHEEL_Z, b.EAR_GAP / 2
+    for i, (x, y, ax) in enumerate(b.WHEELS):
+        for k, s in enumerate((-1, 1)):
+            if ax == "x":
+                sc.pplate("rueda_%d_oreja_%d" % (i, k), (x + (hg if s > 0 else -hg - g.T), y, 0), (0, 1, 0), (0, 0, 1), b.wheel_ear(), b.wheel_ear_holes(), color=MDF)
+            else:
+                sc.pplate("rueda_%d_oreja_%d" % (i, k), (x, y + (hg + g.T if s > 0 else -hg), 0), (1, 0, 0), (0, 0, 1), b.wheel_ear(), b.wheel_ear_holes(), color=MDF)
+        sg = 1.0 if (x + y) > 0 else -1.0          # sentido radial hacia afuera sobre el eje de la rueda
+
+        def rcyl(name, d, a0, a1, color):
+            """cilindro sobre el eje radial de la rueda entre a0 y a1 (a>0 hacia afuera, desde el centro de la rueda)."""
+            lo, hi = sorted((sg * a0, sg * a1))
+            if ax == "x":
+                sc.cmd("solid.cylinder", diameter=d, height=hi - lo, base=[x + lo, y, zw], axis="X", body_name=name)
+                sc.colors[name] = (color, 1.0)
+            else:
+                sc.cyl(name, d, y + lo, y + hi, x, zw, color)
+
+        ea = hg + g.T                               # cara exterior de la oreja
+        sh = b.CAP_FLOOR
+        rcyl("rueda_%d" % i, b.WHEEL_D, -b.WHEEL_W / 2, b.WHEEL_W / 2, "#d0d4da")
+        rcyl("rueda_%d_calzo_a" % i, b.SHIM_OD, -b.WHEEL_W / 2 - b.SHIM_T, -b.WHEEL_W / 2, "#3b82f6")
+        rcyl("rueda_%d_calzo_b" % i, b.SHIM_OD, b.WHEEL_W / 2, b.WHEEL_W / 2 + b.SHIM_T, "#3b82f6")
+        rcyl("rueda_%d_seguro_cabeza" % i, b.CAP_OD, ea, ea + b.CAP_T, "#3b82f6")
+        rcyl("rueda_%d_seguro_tuerca" % i, b.CAP_OD, -ea - b.CAP_T, -ea, "#3b82f6")
+        a_head = ea + sh                            # cara de apoyo de la cabeza del tornillo
+        rcyl("rueda_%d_cabeza" % i, 5.7, a_head, a_head + g.HEAD_T, "#b8bec6")
+        rcyl("rueda_%d_eje" % i, 3.0, a_head - b.WHEEL_BOLT_L, a_head, "#b8bec6")
+        rcyl("rueda_%d_tuerca" % i, 5.5, -ea - sh - g.NUT_T, -ea - sh, "#6b7280")
+    sc.pplate("torreta", (0, 0, b.Z_TURRET[0]), (1, 0, 0), (0, 1, 0), b.turret_disc(), b.turret_holes()[:5] + [b.CABLE_PASS], b.turret_cuts(), color="#9a9a9a", opacity=0.55)
     sc.pplate("travesano", (g.BRACE["x0"], 0, 0), (0, 1, 0), (0, 0, 1), b.brace_plate(), color=MDF)
 
 
@@ -100,16 +126,17 @@ def svgs():
     part(s1, tp, th, 80, 90, "PLACA SUPERIOR x1 (servo J1 + paredes)", rects=tr)
     bp, bh, br = b.bottom_plate()
     part(s1, bp, bh, 250, 90, "PLACA INFERIOR x1", rects=br)
-    part(s1, b.turret_disc(), b.turret_holes(), 70, 235, "TORRETA x1 (disco r=60)", rects=b.turret_slots())
+    part(s1, b.turret_disc(), b.turret_holes(), 70, 235, "TORRETA x1 (disco r=60)", rects=b.turret_cuts())
     part(s1, b.brace_plate(), [], 230, 215, "TRAVESANO x1 (une las mejillas, pasa por las ranuras)")
     part(s1, b.gripper_plate(), b.gripper_plate_holes(), 255, 300, "PLACA DE LA PINZA CON CUELLO x1", rects=[b.gripper_plate_window()])
-    s1.label(5, 8, "Rojo = corte, azul = grabado. 1:1 mm. Ranuras de pared 20.1 x 3.1. Agujeros de la torreta: 4 patines M3, cuerno J1 (centro + 4).", 3.0)
+    s1.label(5, 8, "Rojo = corte, azul = grabado. 1:1 mm. Ranuras de pared 20.1 x 3.1. Torreta: cuerno J1 (centro + 4), 4 huecos de ruedas.", 3.0)
     s1.save(os.path.join(HERE, "corte_mdf_3mm_base_1.svg"))
     s2 = Sheet("Base v2 - paredes - MDF 3 mm", 350, 200)
     part(s2, b.wall_panel(b.WALL_HALF_FRONT, b.FRONT_TABS), [], 90, 50, "PARED FRONTAL x1")
     part(s2, b.wall_panel(b.WALL_HALF_FRONT, b.FRONT_TABS), b.CABLE_HOLE, 90, 110, "PARED TRASERA x1 (agujero de cables)")
     part(s2, b.wall_panel(b.WALL_HALF_SIDE, b.SIDE_TABS), [], 255, 50, "PARED IZQUIERDA x1")
     part(s2, b.wall_panel(b.WALL_HALF_SIDE, b.SIDE_TABS), [], 255, 110, "PARED DERECHA x1")
+    part(s2, b.wheel_ear(), b.wheel_ear_holes(), 170, 165, "OREJA DE RUEDA x8")
     s2.label(5, 190, "Las paredes (z -30..-14) llevan lenguetas de 3 mm que cruzan ambas placas; la altura del dibujo es z.", 3.0)
     s2.save(os.path.join(HERE, "corte_mdf_3mm_base_2.svg"))
 
