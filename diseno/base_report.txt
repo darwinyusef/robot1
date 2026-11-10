@@ -1,0 +1,39 @@
+BASE v2 (fase 4)   placas 140x140  torreta r=60  mesa z=-33 (tapa de la torreta z=0)
+  contorno placa sup.   puntos=  4 area= 19600.0 mm2 simple=True
+  contorno placa inf.   puntos=  4 area= 19600.0 mm2 simple=True
+  contorno torreta      puntos=120 area= 11304.6 mm2 simple=True
+  contorno pared fr/tr  puntos= 28 area=  2504.0 mm2 simple=True
+  contorno pared lat.   puntos= 28 area=  2408.0 mm2 simple=True
+  contorno travesano    puntos=  4 area=   920.0 mm2 simple=True
+  contorno placa pinza  puntos=  8 area=  3266.0 mm2 simple=True
+
+servo J1 vertical: ventana -17.1..6.3 x -6.4..6.4 mm, cuerpo z -26.9..-4.2, orejas z -11.0..-8.5 sobre la placa superior (z tope -11.0)
+  ventana en caja: True
+  holgura cuerpo-placa inferior: 3.1 mm   cuerno apoyado bajo la torreta (z -4..-3), eje del servo asoma 0.2 mm sobre el cuerpo
+  patines: distancia minima a la ventana 32.1 mm (los patines ruedan sobre la placa superior)
+
+ranuras de pared: 12 por placa; lenguetas 20 mm de largo, ranura 20.1 x 3.1 mm (holgura 0.1)
+ranuras de mejilla en la torreta: 4, separacion minima a otros agujeros 10.3 mm
+travesano: 46 x 20 mm, en x 20..23, atraviesa ranuras de ambas mejillas
+
+puente de la pinza: cuello x -52..-24 mm y +-13.75 mm (ranura del antebrazo 3.1 mm abierta al frente) -> placa de la pinza x -24..24
+  cuello se inserta 26 mm en las ranuras del antebrazo; alcance total desde el codo = L2 + 92 = 182 mm
+
+colisiones 3D (3534 puntos de muestreo): antebrazo + pinza contra mesa/torreta/base (todas las guinadas) y mejillas/travesano/servos (plano del brazo)
+theta  psi permitido (min..max) en el peor caso de guinada; piezas que limitan
+    5   -30 ..  -30   (rel  -35 ..  -35)  base,mejilla_der,mejilla_izq,mesa,torreta,travesano
+   15   -35 ..  -20   (rel  -50 ..  -35)  base,mejilla_der,mejilla_izq,mesa,torreta,travesano
+   25   -40 ..  -10   (rel  -65 ..  -35)  base,mesa,torreta
+   35   -50 ..    0   (rel  -85 ..  -35)  base,mesa,torreta
+   45   -55 ..   10   (rel -100 ..  -35)  base,mesa,torreta
+   55   -65 ..   20   (rel -120 ..  -35)  base,mesa,torreta
+   65   -65 ..   30   (rel -130 ..  -35)  base
+   75   -60 ..   40   (rel -135 ..  -35)  -
+   85   -50 ..   50   (rel -135 ..  -35)  -
+psi absoluto total: -65..50 = 115 deg de servo J3 (disponibles 180)
+(con guinada 0 el psi minimo seria -70; con la base cuadrada la guinada de 45 deg es la mas restrictiva por la diagonal)
+limite por software: psi en [psi_min(theta), psi_max(theta)] de la tabla (interpolar), tambien rel en [-135, -35]
+
+J1: servo vertical directo, recorrido util 180 deg = guinada -90..+90 (cable por el agujero trasero de 10 mm)
+
+RESULTADO: OK

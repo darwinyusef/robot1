@@ -1,0 +1,30 @@
+HOMBRO v2  m=2.0  pinon z=14  sector z=28  relacion 2.0:1  entre ejes 42.0 mm
+eje S=(0, 60)  servo J2 en Q=(-29.7, 30.3)  brazo L1=90  recorrido 5..85 deg -> servo 0..160 deg
+  contorno placa brazo  puntos= 224 area= 3215.8 mm2  simple=True
+  contorno capa sector  puntos= 175 area= 1069.8 mm2  simple=True
+  contorno placa izq    puntos=  48 area= 2611.0 mm2  simple=True
+  contorno pinon        puntos= 238 area=  579.9 mm2  simple=True
+fase del pinon: 6.38 deg (intervalo sin solape 5.75..7.00 deg)
+
+theta  servo   solape(mm2)  dist.min(mm)  z_min sector (mm)
+    5      0        0.00          0.09              34.8
+   15     20        0.00          0.09              32.5
+   25     40        0.00          0.11              30.9
+   35     60        0.00          0.09              30.3
+   45     80        0.00          0.11              30.4
+   55    100        0.00          0.09              30.3
+   65    120        0.00          0.10              30.3
+   75    140        0.00          0.09              30.3
+   85    160        0.00          0.10              30.4
+holgura sector-torreta (z_min - 0) = 30.3 mm
+diente con SG90 (1.8 kg*cm): Ft=12.6 N  sigma=3.8 MPa  (MDF ~20 MPa -> FS 5.3)
+diente con MG90S (2.2 kg*cm): Ft=15.4 N  sigma=4.6 MPa  (MDF ~20 MPa -> FS 4.4)
+
+masas (g): placa der. brazo 7.2  capa sector 2.4  placa izq. brazo 5.8  biela (est.) 5.0  antebrazo (est.) 20.0  pinza+servo (est.) 25.0
+carga 20 g, theta= 5: par en el brazo 1.29 kg*cm -> servo 0.71 kg*cm   SG90: 40% del par max.  MG90S: 32% del par max.
+carga 20 g, theta=45: par en el brazo 0.91 kg*cm -> servo 0.51 kg*cm   SG90: 28% del par max.  MG90S: 23% del par max.
+carga 50 g, theta= 5: par en el brazo 1.96 kg*cm -> servo 1.09 kg*cm   SG90: 60% del par max.  MG90S: 49% del par max.
+carga 50 g, theta=45: par en el brazo 1.39 kg*cm -> servo 0.77 kg*cm   SG90: 43% del par max.  MG90S: 35% del par max.
+(regla practica: mantener el servo por debajo de ~60% de su par maximo en reposo)
+
+RESULTADO: OK

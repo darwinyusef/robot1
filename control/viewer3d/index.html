@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Brazo robotico v2 - visor 3D</title>
+<style>
+  :root { --bg:#14171c; --panel:#1d222a; --line:#2e3540; --txt:#e6e9ee; --mut:#98a2b3; --acc:#ffb347; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--txt); font:14px/1.4 system-ui,Segoe UI,sans-serif; overflow:hidden; }
+  #stage { position:fixed; inset:0; }
+  canvas { display:block; }
+  #panel { position:fixed; top:12px; left:12px; width:280px; max-height:calc(100% - 24px); overflow:auto; background:rgba(29,34,42,.92);
+           border:1px solid var(--line); border-radius:10px; padding:12px; backdrop-filter:blur(6px); }
+  #panel h1 { font-size:15px; margin:0 0 2px; }
+  #panel .sub { color:var(--mut); font-size:12px; margin-bottom:10px; }
+  #panel h2 { font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--mut); margin:12px 0 6px; }
+  .anims { display:grid; gap:5px; }
+  button { font:inherit; color:var(--txt); background:#262d37; border:1px solid var(--line); border-radius:7px; padding:6px 9px; cursor:pointer; text-align:left; }
+  button:hover { border-color:#4a5566; } button.on { border-color:var(--acc); color:var(--acc); }
+  .row { display:flex; gap:6px; align-items:center; } .row > * { flex:1; } .row button { text-align:center; flex:0 0 auto; }
+  label.sl { display:grid; grid-template-columns:78px 1fr 44px; gap:6px; align-items:center; font-size:12px; margin:3px 0; }
+  label.sl span.v { text-align:right; color:var(--mut); font-variant-numeric:tabular-nums; }
+  label.ck { display:flex; gap:7px; align-items:center; font-size:13px; margin:4px 0; }
+  input[type=range] { width:100%; accent-color:var(--acc); }
+  #hud { position:fixed; left:0; right:0; bottom:0; padding:0 16px 18px; pointer-events:none; text-align:center; }
+  #cap { display:inline-block; max-width:min(860px,92%); background:rgba(10,12,16,.72); border-radius:8px; padding:8px 16px; font-size:17px; min-height:0; }
+  #cap:empty { display:none; }
+  #ttl { position:fixed; top:14px; right:20px; text-align:right; pointer-events:none; text-shadow:0 1px 8px #000; }
+  #ttl b { display:block; font-size:24px; } #ttl i { font-style:normal; color:var(--mut); }
+  #tl { position:fixed; left:304px; right:16px; bottom:70px; pointer-events:auto; display:flex; gap:10px; align-items:center; }
+  #tl input { flex:1; } #tl .t { width:86px; color:var(--mut); font-variant-numeric:tabular-nums; font-size:12px; text-align:right; }
+  #err { position:fixed; inset:auto 12px 12px auto; color:#ff8a8a; font-size:12px; }
+  body.video #panel, body.video #tl, body.video #err { display:none; }
+  body.video #cap { font-size:22px; } body.video #ttl b { font-size:34px; } body.video #ttl i { font-size:17px; }
+  @media (max-width:720px){ #panel { width:calc(100% - 24px); max-height:46%; } #tl { left:16px; bottom:76px; } #ttl b{font-size:18px;} }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div id="ttl"><b></b><i></i></div>
+<div id="hud"><div id="cap"></div></div>
+<div id="tl"><button id="pp" title="Reproducir / pausa">&#9654;</button><input id="seek" type="range" min="0" max="1000" value="0"><span class="t" id="tt">0:00 / 0:00</span></div>
+<div id="panel">
+  <h1>Brazo rob&oacute;tico v2</h1>
+  <div class="sub">4 servos &middot; MDF 3&nbsp;mm &middot; visor interactivo</div>
+  <h2>Animaciones</h2>
+  <div class="anims" id="animList"></div>
+  <div class="row" style="margin-top:8px"><label class="ck" style="margin:0"><input type="checkbox" id="loop" checked> repetir</label>
+    <label class="sl" style="grid-template-columns:auto 80px 34px;margin:0"><span>vel.</span><input id="speed" type="range" min="25" max="200" value="100"><span class="v" id="speedv">1x</span></label></div>
+  <h2>Control manual</h2>
+  <label class="sl">J1 gui&ntilde;ada<input id="s_yaw" type="range" min="-90" max="90" step="1" value="0"><span class="v" id="v_yaw"></span></label>
+  <label class="sl">J2 hombro<input id="s_th" type="range" min="5" max="85" step="1" value="45"><span class="v" id="v_th"></span></label>
+  <label class="sl">J3 codo<input id="s_psi" type="range" min="-65" max="50" step="1" value="-20"><span class="v" id="v_psi"></span></label>
+  <label class="sl">Pinza<input id="s_phi" type="range" min="0" max="40" step="1" value="20"><span class="v" id="v_phi"></span></label>
+  <div class="sub" id="lim" style="margin:2px 0 0"></div>
+  <h2>Brazo real (ESP32)</h2>
+  <div class="row"><select id="espVia" style="min-width:0;background:#14171c;color:var(--txt);border:1px solid var(--line);border-radius:7px;padding:5px 8px"><option value="ws">WiFi directo (BrazoV2)</option><option value="mqtt">MQTT (internet)</option></select></div>
+  <div class="row"><input id="espUrl" type="text" value="ws://192.168.4.1:81" style="min-width:0;background:#14171c;color:var(--txt);border:1px solid var(--line);border-radius:7px;padding:5px 8px"><button id="espBtn">Conectar</button></div>
+  <div id="espMq" style="display:none">
+    <div class="row"><input id="espUser" type="text" placeholder="usuario MQTT" autocomplete="off" style="min-width:0;background:#14171c;color:var(--txt);border:1px solid var(--line);border-radius:7px;padding:5px 8px"><input id="espPass" type="password" placeholder="clave" autocomplete="off" style="min-width:0;background:#14171c;color:var(--txt);border:1px solid var(--line);border-radius:7px;padding:5px 8px"></div>
+    <div class="row"><input id="espBase" type="text" value="brazo_v2" title="prefijo de topics (MQTT_BASE del firmware)" style="min-width:0;background:#14171c;color:var(--txt);border:1px solid var(--line);border-radius:7px;padding:5px 8px"></div>
+  </div>
+  <div class="sub" id="espStatus" style="margin:4px 0">desconectado (conectar antes el WiFi BrazoV2)</div>
+  <div id="espCtl" style="display:none">
+    <label class="ck"><input type="checkbox" id="espMirror"> espejo en vivo (el brazo sigue al visor)</label>
+    <div class="sub" style="margin:4px 0">Ejecutar en el ESP32:</div>
+    <div class="anims" id="espAnims"></div>
+    <div class="row" style="margin-top:6px"><button id="espTour">Recorrido</button><button id="espHome">Reposo</button><button id="espStop">Parar</button></div>
+  </div>
+  <h2>Vista</h2>
+  <label class="ck"><input type="checkbox" id="autocam" checked> c&aacute;mara autom&aacute;tica en las animaciones</label>
+  <label class="ck"><input type="checkbox" id="mdf"> MDF transl&uacute;cido</label>
+  <label class="sl" style="grid-template-columns:78px 1fr 10px">Despiece<input id="explode" type="range" min="0" max="100" value="0"><span></span></label>
+  <div class="row" style="margin-top:6px"><button id="vFront">Frontal</button><button id="vSide">Lateral</button><button id="vTop">Planta</button><button id="vIso">3/4</button></div>
+  <div class="sub" style="margin-top:10px">Arrastra para orbitar, rueda para acercar, clic derecho para desplazar.<br>Los l&iacute;mites de J3 dependen de J2 (tabla de <code>limites.h</code>).</div>
+</div>
+<div id="err"></div>
+<script src="lib/three.min.js"></script>
+<script src="lib/OrbitControls.js"></script>
+<script src="lib/BufferGeometryUtils.js"></script>
+<script src="robot_data.js"></script>
+<script src="kin.js"></script>
+<script>Kin.init(ROBOT_DATA.meta);</script>
+<script src="anims.js"></script>
+<script src="app.js"></script>
+<script src="lib/mqtt.min.js"></script>
+<script src="esp32.js"></script>
+</body>
+</html>

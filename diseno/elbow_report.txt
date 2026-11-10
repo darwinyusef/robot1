@@ -1,0 +1,39 @@
+CODO v2  manivela RC=16  biela 90  antebrazo L2=90  limites rel=psi-theta: -135..-35
+
+mapa de colisiones: filas theta, columnas rel=psi-theta (grados).  . libre   X choque
+theta  -150  -140  -130  -120  -110  -100   -90   -80   -70   -60   -50   -40   -30   -20
+    5     F     F     F     F     F     F     F     F     F     F     F     F     .     X
+   15     F     F     F     F     F     F     F     F     F     F     .     .     .     X
+   25     F     F     F     F     F     F     F     F     .     .     .     .     .     X
+   35     F     F     F     F     F     F     F     .     .     .     .     .     .     X
+   45     F     F     F     F     F     .     .     .     .     .     .     .     .     X
+   55     F     F     F     .     .     .     .     .     .     .     .     .     .     X
+   65     F     F     .     .     .     .     .     .     .     .     .     .     .     X
+   75     .     .     .     .     .     .     .     .     .     .     .     .     .     X
+   85     .     .     .     .     .     .     .     .     .     .     .     .     .     X
+(F = solo toca el plano del suelo con la pinza; se resuelve con un limite acoplado por software)
+sin choques de piezas dentro de rel -135..-35
+choques de piezas fuera del rango (justifican el limite): biela-pern_S
+
+theta  psi_min(suelo)  psi_max   rel permitido
+    5            -34      -30   -39..-35
+   15            -40      -20   -55..-35
+   25            -46      -10   -71..-35
+   35            -53        0   -88..-35
+   45            -59       10   -104..-35
+   55            -66       20   -121..-35
+   65            -70       30   -135..-35
+   75            -60       40   -135..-35
+   85            -50       50   -135..-35
+psi absoluto total: -70..50 deg = 120 deg de servo J3 (el servo ofrece 180)
+(comando: psi limitado a [max(theta-135, psi_suelo(theta)), theta-35])
+brazo de palanca util en los limites: |sin(rel)| >= 0.57
+
+masas (g): placa izq. antebrazo 3.1  placa der. 2.9  biela 1.9  manivela 0.9  separador+tornilleria 3.0
+carga 20 g: par J3 (antebrazo horizontal) 0.69 kg*cm, J2 (con antebrazo en el codo) 0.31 kg*cm -> SG90: J3 38%  J2 17%   MG90S: J3 31%  J2 14%
+   fuerza en la biela 7.4 N; pandeo de Euler (E=3 GPa supuesto) 74 N -> FS 10.0;  flexion manivela 2.9 MPa
+carga 50 g: par J3 (antebrazo horizontal) 1.20 kg*cm, J2 (con antebrazo en el codo) 0.46 kg*cm -> SG90: J3 67%  J2 26%   MG90S: J3 55%  J2 21%
+   fuerza en la biela 12.8 N; pandeo de Euler (E=3 GPa supuesto) 74 N -> FS 5.8;  flexion manivela 5.1 MPa
+(J2 ya no carga el peso del antebrazo a su distancia real: el paralelogramo lo traslada al servo J3)
+
+RESULTADO: OK

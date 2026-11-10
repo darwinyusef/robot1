@@ -1,0 +1,79 @@
+VERIFICACION GLOBAL v2 (fase 5)  -  4 servos, MDF 3 mm
+
+1. COLISIONES: rejilla theta (paso 5) x rel (paso 5) x guinada 0..90 (7 pasos); capas en Y + nube 3D + travesano
+theta  psi factible (rel dentro de [-135,-35])
+    5  -30..-30 (1 poses)
+   10  -35..-25 (3 poses)
+   15  -35..-20 (4 poses)
+   20  -40..-15 (6 poses)
+   25  -40..-10 (7 poses)
+   30  -45..-5 (9 poses)
+   35  -50..0 (11 poses)
+   40  -50..5 (12 poses)
+   45  -55..10 (14 poses)
+   50  -60..15 (16 poses)
+   55  -65..20 (18 poses)
+   60  -65..25 (19 poses)
+   65  -65..30 (20 poses)
+   70  -60..35 (20 poses)
+   75  -60..40 (21 poses)
+   80  -55..45 (21 poses)
+   85  -50..50 (21 poses)
+choques de piezas de capas dentro de las poses de la rejilla (incluye travesano): ninguno
+poses factibles: 223 de 357
+psi total usado -65..50 = 115 deg (servo J3: 180)   theta 5..85 = 80 deg de brazo = 160 deg de servo J2 (180)
+
+2. ALCANCE (posicion de las puntas de la pinza, plano del brazo; r = distancia al eje J1, z desde la tapa de la torreta)
+alcance horizontal maximo: r=261 mm (z=66, theta=25, psi=-10)
+altura maxima de las puntas: z=289 mm (r=125)   minima: z=-31 mm (r=129)
+puntas a <= 8 mm de la mesa (recoger del suelo): r = 122 .. 238 mm
+puntas a <= 40 mm de la mesa: r = 114 .. 254 mm
+mapa (cada celda 20 mm; # = alguna punta; fila superior = z alto). r de 0 a 260:
+  z= 260  ......###.....
+  z= 240  .......##.....
+  z= 220  ........##....
+  z= 200  ........###...
+  z= 180  .........###..
+  z= 160  .........###..
+  z= 140  .........####.
+  z= 120  .........####.
+  z= 100  .........####.
+  z=  80  ........#####.
+  z=  60  ........######
+  z=  40  .......#######
+  z=  20  ......#######.
+  z=   0  ......#######.
+  z= -20  .....########.
+  z= -40  -----########-
+
+3. PAR POR ARTICULACION (estatica con masas reales de las piezas; maximo sobre todas las poses factibles)
+   rendimiento: engranes 0.9, biela 0.9; pinza SG90; J2/J3 comparados con SG90 y MG90S (limite recomendado 60 % del par de bloqueo)
+carga  0 g: J2 0.22 kg*cm (theta=5, psi=-30) -> SG90 12%  MG90S 10%
+            J3 0.37 kg*cm (theta=65, psi=0) -> SG90 20%  MG90S 17%
+carga 20 g: J2 0.31 kg*cm (theta=5, psi=-30) -> SG90 17%  MG90S 14%
+            J3 0.74 kg*cm (theta=85, psi=0) -> SG90 41%  MG90S 34%
+carga 50 g: J2 0.46 kg*cm (theta=5, psi=-30) -> SG90 26%  MG90S 21%
+            J3 1.31 kg*cm (theta=65, psi=0) -> SG90 73%  MG90S 60%
+masa en el antebrazo + pinza + carga 50 g: 88 g;  brazo (3 capas) 15.4 g;  manivela+media biela 1.9 g
+-> con 50 g: MG90S J2 21% / J3 60% (ok <60%); con SG90 J3 seria 73% (NO pasa)
+carga maxima con MG90S bajo el 60 %: 50 g (barrido 20/35/50/65/80 g)
+carga maxima con SG90 en J3 bajo el 60 %: 30 g
+
+4. BIELA: fuerza maxima 14.0 N (|sin rel| >= 0.57), pandeo de Euler 74 N -> FS 5.3
+
+5. J1 (guinada) y VUELCO DE LA TORRETA (patines a +-35 mm; la torreta esta sujeta al cuerno del J1 en el centro)
+fuerza de arranque en el centro (peor caso): 3.3 N = 337 gf   (carga 50 g, theta=20, psi=-15, de frente; masa total 194 g)
+  -> el tornillo central del cuerno del J1 debe sujetar la torreta; la salida del servo (SG90/MG90S) soporta cargas axiales de ese orden, pero no es un cojinete
+  flexion del disco de la torreta junto al cuerno: ~1.9 MPa (MDF ~20 MPa)
+inercia de J1 respecto del eje: 2.02e-04 (replegado, sin carga) .. 4.28e-03 kg*m2 (extendido, 50 g);  friccion de patines ~0.29 kg*cm (mu=0.3, 194 g)
+  SG90: aceleracion angular admisible al 60 % = 18 rad/s2 -> barrido de 180 deg en >= 0.83 s (extendido, 50 g)
+  MG90S: aceleracion angular admisible al 60 % = 24 rad/s2 -> barrido de 180 deg en >= 0.73 s (extendido, 50 g)
+
+6. PINZA
+  SG90: fuerza en las almohadillas ~3.8 N por mandibula (radio 42 mm); sujetar 50 g con mu=0.4 necesita 0.6 N -> FS 6
+  MG90S: fuerza en las almohadillas ~4.7 N por mandibula (radio 42 mm); sujetar 50 g con mu=0.4 necesita 0.6 N -> FS 8
+  diente de la pinza (SG90): Ft=11.0 N, sigma=3.3 MPa (MDF 20 MPa -> FS 6.1)
+
+7. RECORRIDOS DE SERVO: J1 180 deg (guinada +-90), J2 160 deg, J3 115 deg, pinza 40 deg (1:1)
+
+RESULTADO: OK
