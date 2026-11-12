@@ -54,7 +54,7 @@ def j1_window():
 
 
 def j1_tab_holes():
-    return [(g.TAB_X0 + g.TAB_INSET, 0.0, 2.2), (g.TAB_X1 - g.TAB_INSET, 0.0, 2.2)]
+    return [(g.TAB_X0 + g.TAB_INSET, 0.0, g.EAR_D), (g.TAB_X1 - g.TAB_INSET, 0.0, g.EAR_D)]
 
 
 def square(h):
@@ -79,7 +79,7 @@ CABLE_PASS = (-28.0, 0.0, 10.0)      # paso de los cables de J2/J3/pinza: mismo 
 
 
 def top_plate():
-    return square(HB), [(g.TAB_X0 + g.TAB_INSET, 0.0, 2.2), (g.TAB_X1 - g.TAB_INSET, 0.0, 2.2), CABLE_PASS] + \
+    return square(HB), [(g.TAB_X0 + g.TAB_INSET, 0.0, g.EAR_D), (g.TAB_X1 - g.TAB_INSET, 0.0, g.EAR_D), CABLE_PASS] + \
         [(sx * CORNER, sy * CORNER, 9.0) for sx in (-1, 1) for sy in (-1, 1)], [j1_window()] + wall_slots()
 
 

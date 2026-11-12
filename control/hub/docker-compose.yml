@@ -1,0 +1,31 @@
+# Desde control/hub:  cp .env.example .env  (poner HUB_TOKEN)  &&  docker compose up -d --build
+services:
+  hub:
+    build: { context: .., dockerfile: hub/Dockerfile }
+    container_name: brazo_v2_hub
+    restart: unless-stopped
+    env_file: .env
+    ports: ["8080:8080"]
+
+  # Broker MQTT local (opcional): docker compose --profile mqtt up -d  y en .env MQTT_HOST=mosquitto
+  mosquitto:
+    image: eclipse-mosquitto:2
+    profiles: ["mqtt"]
+    container_name: brazo_v2_mqtt
+    restart: unless-stopped
+    ports: ["127.0.0.1:1883:1883"]
+    volumes: ["./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro"]
+
+  # HTTPS/WSS (el visor en https y el ESP32 con HUB_TLS=1): docker compose --profile tls up -d  (DOMAIN en .env, puertos 80/443 libres)
+  caddy:
+    image: caddy:2-alpine
+    profiles: ["tls"]
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    environment: { DOMAIN: "${DOMAIN:-localhost}" }
+    command: caddy reverse-proxy --from ${DOMAIN:-localhost} --to hub:8080
+    volumes: [caddy_data:/data]
+    depends_on: [hub]
+
+volumes:
+  caddy_data:

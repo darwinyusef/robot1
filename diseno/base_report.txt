@@ -7,9 +7,9 @@ BASE v2 (fase 4)   placas 140x140  torreta r=60  mesa z=-33 (tapa de la torreta 
   contorno travesano    puntos=  4 area=   920.0 mm2 simple=True
   contorno placa pinza  puntos=  8 area=  2415.0 mm2 simple=True
 
-servo J1 vertical: ventana -17.1..6.3 x -6.4..6.4 mm, cuerpo z -26.9..-4.2, orejas z -11.0..-8.5 sobre la placa superior (z tope -11.0)
+servo J1 vertical: ventana -19.2..6.2 x -7.3..7.3 mm, cuerpo z -28.7..-4.2, orejas z -11.0..-8.5 sobre la placa superior (z tope -11.0)
   ventana en caja: True
-  holgura cuerpo-placa inferior: 3.1 mm   cuerno apoyado bajo la torreta (z -4..-3), eje del servo asoma 0.2 mm sobre el cuerpo
+  holgura cuerpo-placa inferior: 1.3 mm   cuerno apoyado bajo la torreta (z -4..-3), eje del servo asoma 0.2 mm sobre el cuerpo
   ruedas: la pista R=51 queda a 10.9 mm del agujero o ranura mas cercano de la placa superior
   rueda (+51,+0) eje x: hueco hasta r=56.5 (torreta R=60), a 39.1 mm del agujero mas cercano
   rueda (-51,+0) eje x: hueco hasta r=56.5 (torreta R=60), a 12.7 mm del agujero mas cercano

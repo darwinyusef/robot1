@@ -55,19 +55,28 @@
   <label class="sl">Pinza<input id="s_phi" type="range" min="0" max="40" step="1" value="20"><span class="v" id="v_phi"></span></label>
   <div class="sub" id="lim" style="margin:2px 0 0"></div>
   <h2>Brazo real (ESP32)</h2>
-  <div class="row"><select id="espVia" style="min-width:0;background:#14171c;color:var(--txt);border:1px solid var(--line);border-radius:7px;padding:5px 8px"><option value="ws">WiFi directo (BrazoV2)</option><option value="mqtt">MQTT (internet)</option></select></div>
-  <div class="row"><input id="espUrl" type="text" value="ws://192.168.4.1:81" style="min-width:0;background:#14171c;color:var(--txt);border:1px solid var(--line);border-radius:7px;padding:5px 8px"><button id="espBtn">Conectar</button></div>
+  <div class="row"><select id="espVia" style="min-width:0;background:#14171c;color:var(--txt);border:1px solid var(--line);border-radius:7px;padding:5px 8px"><option value="hub" selected>Hub (Docker, WiFi del ESP32)</option><option value="ws">WiFi directo (BrazoV2)</option><option value="mqtt">MQTT (internet)</option></select></div>
+  <div class="row"><input id="espUrl" type="text" value="" style="min-width:0;background:#14171c;color:var(--txt);border:1px solid var(--line);border-radius:7px;padding:5px 8px"><button id="espBtn">Conectar</button></div>
+  <div id="espHub"><div class="row"><input id="espTok" type="password" placeholder="token del hub (HUB_TOKEN)" autocomplete="off" style="min-width:0;background:#14171c;color:var(--txt);border:1px solid var(--line);border-radius:7px;padding:5px 8px"></div></div>
   <div id="espMq" style="display:none">
     <div class="row"><input id="espUser" type="text" placeholder="usuario MQTT" autocomplete="off" style="min-width:0;background:#14171c;color:var(--txt);border:1px solid var(--line);border-radius:7px;padding:5px 8px"><input id="espPass" type="password" placeholder="clave" autocomplete="off" style="min-width:0;background:#14171c;color:var(--txt);border:1px solid var(--line);border-radius:7px;padding:5px 8px"></div>
     <div class="row"><input id="espBase" type="text" value="brazo_v2" title="prefijo de topics (MQTT_BASE del firmware)" style="min-width:0;background:#14171c;color:var(--txt);border:1px solid var(--line);border-radius:7px;padding:5px 8px"></div>
   </div>
-  <div class="sub" id="espStatus" style="margin:4px 0">desconectado (conectar antes el WiFi BrazoV2)</div>
+  <div class="sub" id="espStatus" style="margin:4px 0">desconectado</div>
   <div id="espCtl" style="display:none">
-    <label class="ck"><input type="checkbox" id="espMirror"> espejo en vivo (el brazo sigue al visor)</label>
+    <label class="ck"><input type="checkbox" id="espMirror" autocomplete="off"> espejo en vivo (el brazo sigue al visor)</label>
     <div class="sub" style="margin:4px 0">Ejecutar en el ESP32:</div>
     <div class="anims" id="espAnims"></div>
-    <div class="row" style="margin-top:6px"><button id="espTour">Recorrido</button><button id="espHome">Reposo</button><button id="espStop">Parar</button></div>
+    <div class="row" style="margin-top:6px"><button id="espTour">Recorrido</button><button id="espHome">Reposo</button><button id="espStop">Parar</button><button id="espOff">Apagar</button></div>
+    <div class="sub" style="margin:8px 0 2px">Prueba individual (apaga todo, barre 0-180-0 y apaga)</div>
+    <div class="row"><button class="espTest" data-t="1">J1</button><button class="espTest" data-t="2">J2</button><button class="espTest" data-t="3">J3</button><button class="espTest" data-t="4">Pinza</button><button class="espTest" data-t="">Todos</button></div>
   </div>
+  <h2>Control por mano (c&aacute;mara)</h2>
+  <div class="row"><button id="visionStart">Activar c&aacute;mara</button><button id="visionStop" disabled>Detener</button></div>
+  <div id="visionBox" style="position:relative;display:none;margin:6px 0"><video id="visionVideo" playsinline muted style="width:100%;border-radius:7px;transform:scaleX(-1);background:#000"></video><canvas id="handLandmarks" style="position:absolute;left:0;top:0;width:100%;height:100%;transform:scaleX(-1);pointer-events:none"></canvas></div>
+  <label class="ck"><input type="checkbox" id="sendToRealRobot" autocomplete="off"> enviar tambi&eacute;n al brazo real (activa el espejo)</label>
+  <div class="sub" id="visionStatus" style="margin:4px 0">c&aacute;mara apagada</div>
+  <div class="sub">Mano a izq./der. = J1, arriba/abajo = J2, acercar/alejar = J3, pellizco = pinza.</div>
   <h2>Vista</h2>
   <label class="ck"><input type="checkbox" id="autocam" checked> c&aacute;mara autom&aacute;tica en las animaciones</label>
   <label class="ck"><input type="checkbox" id="mdf"> MDF transl&uacute;cido</label>
@@ -83,8 +92,10 @@
 <script src="kin.js"></script>
 <script>Kin.init(ROBOT_DATA.meta);</script>
 <script src="anims.js"></script>
-<script src="app.js"></script>
+<script src="app.js?v=20261114"></script>
 <script src="lib/mqtt.min.js"></script>
-<script src="esp32.js"></script>
+<script src="esp32.js?v=20261114"></script>
+<script src="handpose.js?v=20261114"></script>
+<script type="module" src="vision_pose.js?v=20261114"></script>
 </body>
 </html>

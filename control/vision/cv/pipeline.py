@@ -13,6 +13,7 @@ from .hand_tracker   import HandTracker, HandResult
 from .presence       import PresenceDetector
 from .zone_mapper    import ZoneMapper, DwellState
 from .screen_reader  import ScreenReader
+from .pose_map       import PoseMapper
 from .overlay        import draw_zone_grid, draw_finger, draw_status_panel
 
 
@@ -46,11 +47,15 @@ class CVPipeline:
         debug_window:   bool  = True,
         mirror:         bool  = True,
         on_event:       EventCallback | None = None,
+        pose_mode:      bool  = False,
     ):
         self._cam_idx      = camera_index
         self._debug        = debug_window
         self._mirror       = mirror
         self._on_event     = on_event
+        self._pose_mode    = pose_mode          # True: manda la pose del brazo (evento 'pose', 25 Hz) en vez de las zonas
+        self._pose_map     = PoseMapper()
+        self._pose_t       = 0.0
 
         self._tracker      = HandTracker()
         self._presence     = PresenceDetector()
@@ -91,7 +96,9 @@ class CVPipeline:
                 result = await self._process_frame(frame)
 
                 # ── Emitir eventos ──────────────────────────────
-                if self._on_event:
+                if self._on_event and self._pose_mode:
+                    await self._emit_pose(frame, result)
+                elif self._on_event:
                     dwell = result.dwell
 
                     if dwell.zone != prev_zone:
@@ -174,6 +181,18 @@ class CVPipeline:
             draw_finger(frame, result.hand.index_x, result.hand.index_y, color, result.hand.pinching)
 
         draw_status_panel(frame, result.dwell, result.present, result.fps, result.hand.confidence)
+
+    async def _emit_pose(self, frame, result: FrameResult):
+        if not result.hand.detected or not result.hand.landmarks:
+            self._pose_map.reset()
+            return
+        now = time.time()
+        if now - self._pose_t < 0.04:
+            return
+        self._pose_t = now
+        h, w = frame.shape[:2]
+        pose = self._pose_map.update(result.hand.landmarks, w / h)
+        await self._emit({"type": "pose", **{k: round(v, 1) for k, v in pose.items()}})
 
     async def _emit(self, event: dict):
         if self._on_event:

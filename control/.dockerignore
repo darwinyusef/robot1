@@ -1,0 +1,10 @@
+**/*.mp4
+**/__pycache__
+**/.pytest_cache
+viewer3d/tools
+esp32
+vision
+brazo_v2
+mqtt
+hub/test_hub.py
+hub/.env

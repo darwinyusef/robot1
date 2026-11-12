@@ -251,6 +251,16 @@
   }
   function play(v) { playing = v; el('pp').innerHTML = v ? '&#10074;&#10074;' : '&#9654;'; }
 
+  // el brazo real manda "TP yaw th psi phi" durante su prueba: el 3D lo sigue (modo manual, dentro de los limites del modelo)
+  window.ESPVIEW = {
+    pose: function (p) {
+      if (tl) { load(null); play(false); }
+      var lim = function (k, v) { return K.clamp(v, parseFloat(el('s_' + k).min), parseFloat(el('s_' + k).max)); };
+      manual.yaw = lim('yaw', p.yaw); manual.phi = lim('phi', p.phi);
+      manual.th = K.clampTheta(p.th); manual.psi = K.clampPsi(manual.th, p.psi);
+    }
+  };
+
   // UI
   var list = el('animList');
   [{ id: 'tour', name: 'Recorrido completo (' + fmt(A.build('tour').duration) + ')' }].concat(A.LIST).forEach(function (a) {
@@ -314,7 +324,7 @@
   if (VIDEO) { frame(0); renderer.render(scene, camera); }
   else {
     var start = q.get('anim');
-    if (start === 'manual') load(null); else load(start || 'tour');
+    if (start === 'tour' || (start && start !== 'manual')) load(start); else load(null);
     requestAnimationFrame(loop);
   }
 })();

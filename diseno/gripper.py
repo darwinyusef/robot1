@@ -42,11 +42,12 @@ L1, LP = 26.0, 26.0           # tramo recto y almohadilla
 C0 = 0.0                      # fase de dientes (mandibula A, rad)
 
 # servo SG90 / MG90S (verificar con calibre)
-SV_L, SV_W, SV_H = 22.8, 12.2, 22.7
-SV_TAB_L, SV_TAB_T = 32.5, 2.5
+SV_L, SV_W, SV_H = 25.0, 14.0, 24.5
+SV_TAB_L, SV_TAB_T = 33.0, 2.5
 SV_SHAFT_FROM_END = 6.0
-SV_BELOW = 15.9               # cuerpo por debajo de la cara inferior de las orejas
-SV_TAB_HOLE_INSET = 2.4
+SV_BELOW = 17.0               # cuerpo por debajo de la cara inferior de las orejas
+SV_TAB_HOLE_INSET = 2.0
+SV_EAR_D = 1.5
 GEAR_Z0 = 8.0                 # cara inferior de los engranes sobre la placa (cuerpo servo sobresale 6.8 + holgura de cuerno)
 HORN_HOLE_R, HORN_HOLE_D = 8.0, 1.8
 CENTER_HOLE_A, CENTER_HOLE_B = 7.6, 3.2
@@ -251,10 +252,10 @@ def hole_abs(hs, which, phi_deg):
 # ------------------------------------------------------------------ placa base
 PLATE = dict(x0=-30.0, x1=11.0, y0=-22.0, y1=25.0)   # justo hasta la oreja del servo (x 10.85) y el pivote B; libre bajo las mandibulas
 BODY_X0, BODY_X1 = -(SV_L - SV_SHAFT_FROM_END), SV_SHAFT_FROM_END        # cuerpo del servo en X
-WIN = (BODY_X0 - 0.3, BODY_X1 + 0.3, PIV - SV_W / 2 - 0.3, PIV + SV_W / 2 + 0.3)
+WIN = (BODY_X0 - 0.2, BODY_X1 + 0.2, PIV - SV_W / 2 - 0.3, PIV + SV_W / 2 + 0.3)
 TAB_X0 = 0.5 * (BODY_X0 + BODY_X1) - SV_TAB_L / 2
 TAB_X1 = TAB_X0 + SV_TAB_L
-PLATE_HOLES = ([(TAB_X0 + SV_TAB_HOLE_INSET, PIV, 2.2), (TAB_X1 - SV_TAB_HOLE_INSET, PIV, 2.2),
+PLATE_HOLES = ([(TAB_X0 + SV_TAB_HOLE_INSET, PIV, SV_EAR_D), (TAB_X1 - SV_TAB_HOLE_INSET, PIV, SV_EAR_D),
                 (0.0, -PIV, 3.2)]
                + [(-26.0, 20.0, 3.2), (-26.0, -20.0, 3.2)])
 

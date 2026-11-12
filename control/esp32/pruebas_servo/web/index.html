@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Control del servo</title>
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: "Segoe UI", system-ui, sans-serif;
+            color: #252236;
+            background: #f4f1f8;
+            font-synthesis: none;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+        }
+
+        .card {
+            width: min(100%, 520px);
+            padding: 30px;
+            border: 1px solid #e5deed;
+            border-radius: 22px;
+            background: #fff;
+            box-shadow: 0 18px 50px #35205012;
+        }
+
+        .topline,
+        .reading,
+        .actions,
+        .scale {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.45rem;
+        }
+
+        .subtitle {
+            margin: 8px 0 24px;
+            color: #716b7e;
+            line-height: 1.5;
+        }
+
+        .status {
+            flex: none;
+            padding: 7px 11px;
+            border-radius: 999px;
+            background: #f0edf4;
+            color: #6b6378;
+            font-size: .82rem;
+        }
+
+        .status.connected {
+            background: #e8f6ec;
+            color: #23743b;
+        }
+
+        .reading {
+            margin-bottom: 14px;
+        }
+
+        .reading span {
+            color: #716b7e;
+        }
+
+        output {
+            font-size: 2.25rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        output small {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 34px;
+            margin: 8px 0 0;
+            accent-color: #9870bd;
+            cursor: pointer;
+        }
+
+        input[type="range"]:disabled {
+            cursor: not-allowed;
+            opacity: .55;
+        }
+
+        .scale {
+            color: #827b8b;
+            font-size: .82rem;
+        }
+
+        .actions {
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            margin-top: 24px;
+        }
+
+        button {
+            min-height: 42px;
+            padding: 0 16px;
+            border: 0;
+            border-radius: 11px;
+            background: #8b62b1;
+            color: #fff;
+            font: inherit;
+            font-weight: 650;
+            cursor: pointer;
+        }
+
+        button.secondary {
+            background: #eee9f3;
+            color: #493a59;
+        }
+
+        button:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+
+        .message {
+            min-height: 24px;
+            margin: 18px 0 0;
+            color: #514b5d;
+            font-size: .92rem;
+            line-height: 1.5;
+        }
+
+        .note {
+            margin: 12px 0 0;
+            color: #827b8b;
+            font-size: .8rem;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="card">
+        <div class="topline">
+            <h1>Control del servo</h1>
+            <span id="status" class="status">Desconectado</span>
+        </div>
+        <p class="subtitle">Conecta el ESP32 y mueve la barra para elegir la posición del SG90.</p>
+
+        <div class="reading">
+            <span>Posición</span>
+            <output id="angleValue" for="angle">90<small>°</small></output>
+        </div>
+        <input id="angle" type="range" min="20" max="180" step="1" value="90" aria-label="Ángulo del servo" disabled>
+        <div class="scale"><span>20°</span><span>90°</span><span>180°</span></div>
+
+        <div class="actions">
+            <button id="connect">Conectar ESP32</button>
+            <button id="center" class="secondary" disabled>Centrar en 90°</button>
+            <button id="disconnect" class="secondary" disabled>Desconectar</button>
+        </div>
+
+        <p id="message" class="message" role="status">Conecta la placa por USB. Luego pulsa “Conectar ESP32” y elige
+            Silicon Labs CP210x (COM4).</p>
+        <p class="note">El recorrido se limita a 20°–180° para evitar que el servo empuje contra sus topes. Deja libre
+            el brazo del servo.</p>
+    </main>
+
+    <script>
+        const connectButton = document.querySelector("#connect");
+        const disconnectButton = document.querySelector("#disconnect");
+        const centerButton = document.querySelector("#center");
+        const angleSlider = document.querySelector("#angle");
+        const angleValue = document.querySelector("#angleValue");
+        const statusLabel = document.querySelector("#status");
+        const message = document.querySelector("#message");
+        const encoder = new TextEncoder();
+
+        let port = null;
+        let writer = null;
+        let sendQueue = Promise.resolve();
+        let sendTimer = null;
+        let lastSliderSendAt = 0;
+
+        const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        function setConnected(connected) {
+            statusLabel.textContent = connected ? "Conectado" : "Desconectado";
+            statusLabel.classList.toggle("connected", connected);
+            connectButton.disabled = connected;
+            disconnectButton.disabled = !connected;
+            centerButton.disabled = !connected;
+            angleSlider.disabled = !connected;
+        }
+
+        function sendAngle(angle) {
+            if (!writer) return;
+            const command = encoder.encode(`${angle}\n`);
+            sendQueue = sendQueue
+                .then(() => writer ? writer.write(command) : undefined)
+                .catch(error => {
+                    message.textContent = `No se pudo enviar el ángulo: ${error.message}`;
+                });
+        }
+
+        connectButton.addEventListener("click", async () => {
+            if (!("serial" in navigator)) {
+                message.textContent = "Este navegador no ofrece conexión serial web. Prueba con Microsoft Edge o Google Chrome en el PC.";
+                return;
+            }
+
+            try {
+                message.textContent = "Elige el puerto Silicon Labs CP210x (COM4) en la ventana del navegador…";
+                port = await navigator.serial.requestPort();
+                await port.open({ baudRate: 115200 });
+                writer = port.writable.getWriter();
+                setConnected(true);
+                message.textContent = "Puerto abierto. Esperando que el ESP32 reinicie…";
+                await wait(1800);
+                sendAngle(Number(angleSlider.value));
+                message.textContent = `Conectado. Ángulo enviado: ${angleSlider.value}°.`;
+            } catch (error) {
+                message.textContent = error.name === "NotFoundError"
+                    ? "No se seleccionó ningún puerto. Vuelve a pulsar “Conectar ESP32”."
+                    : `No se pudo abrir el puerto: ${error.message}. Cierra el Monitor Serial de PlatformIO si está abierto.`;
+                if (writer) {
+                    try { writer.releaseLock(); } catch (_) { }
+                    writer = null;
+                }
+                if (port) {
+                    try { await port.close(); } catch (_) { }
+                    port = null;
+                }
+                setConnected(false);
+            }
+        });
+
+        angleSlider.addEventListener("input", () => {
+            angleValue.innerHTML = String(angleSlider.value) + "<small>°</small>";
+            clearTimeout(sendTimer);
+            const elapsed = performance.now() - lastSliderSendAt;
+            const waitMs = Math.max(0, 20 - elapsed);
+            sendTimer = setTimeout(() => {
+                sendTimer = null;
+                lastSliderSendAt = performance.now();
+                sendAngle(Number(angleSlider.value));
+                if (writer) {
+                    message.textContent = "Ángulo enviado: " + angleSlider.value + "°.";
+                }
+            }, waitMs);
+        });
+
+        centerButton.addEventListener("click", () => {
+            angleSlider.value = "90";
+            angleValue.innerHTML = "90<small>°</small>";
+            sendAngle(90);
+            message.textContent = "Ángulo enviado: 90°.";
+        });
+
+        disconnectButton.addEventListener("click", async () => {
+            clearTimeout(sendTimer);
+            try {
+                if (writer) {
+                    await writer.close();
+                    writer.releaseLock();
+                }
+                if (port) await port.close();
+            } catch (error) {
+                message.textContent = `Se cerró la conexión: ${error.message}`;
+            }
+            writer = null;
+            port = null;
+            sendQueue = Promise.resolve();
+            setConnected(false);
+            message.textContent = "Desconectado. Ya puedes volver a cargar código desde PlatformIO.";
+        });
+
+        if (!("serial" in navigator)) {
+            message.textContent = "Si no aparece el selector del puerto, abre esta página en Microsoft Edge o Google Chrome de escritorio.";
+        }
+    </script>
+</body>
+
+</html>

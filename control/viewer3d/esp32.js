@@ -1,10 +1,12 @@
-/* Conexion del visor con el ESP32 (firmware en ../esp32/brazo_v2_esp32). Dos vias, mismos comandos de texto (ver el .ino):
+/* Conexion del visor con el ESP32 (firmware en ../esp32/brazo_v2_esp32). Tres vias, mismos comandos de texto (ver el .ino):
+   - Hub (Docker, ../hub): WebSocket a /ws/client del hub; el ESP32 se conecta al mismo hub por WiFi. Pide el token del hub (no se guarda).
    - WiFi directo: WebSocket a ws://192.168.4.1:81 (red BrazoV2).
    - MQTT: wss://mqtt.aquicreamos.com; publica en <base>/cmd, escucha <base>/evt, <base>/state y <base>/status. Usuario/clave no se guardan.
    - Espejo en vivo: cada cuadro del visor (animacion o sliders) se manda como "P yaw th psi phi" a ~25 Hz.
    - Ejecutar en el ESP32: "PLAY id", el brazo reproduce la animacion por su cuenta (sin el visor). */
 (function () {
-  var sock = null, mq = null, mqBase = '', mirror = false, lastSend = 0, lastPose = '';
+  var wantHub = false, retryT = null, retries = 0;
+  var sock = null, pingT = null, mq = null, mqBase = '', mirror = false, lastSend = 0, lastPose = '';
   var el = function (id) { return document.getElementById(id); };
 
   function status(s, ok) { var e = el('espStatus'); e.textContent = s; e.style.color = ok ? '#43d17a' : '#98a2b3'; }
@@ -22,21 +24,48 @@
     });
   }
 
-  function connect() {
-    if (sock) { sock.close(); return; }
-    var url = el('espUrl').value.trim();
+  function hubUrl() {
+    var u = el('espUrl').value.trim(), t = el('espTok').value;
+    return u + (u.indexOf('?') < 0 ? '?' : '&') + 'token=' + encodeURIComponent(t);
+  }
+
+  function connect(auto) {
+    if (sock) { wantHub = false; clearTimeout(retryT); sock.close(); return; }
+    var hub = el('espVia').value === 'hub';
+    if (auto !== true) retries = 0;
+    wantHub = hub;
+    var url = hub ? hubUrl() : el('espUrl').value.trim();
     try { sock = new WebSocket(url); } catch (e) { status('URL invalida', false); sock = null; return; }
+    var me = sock;
     status('conectando...', false);
-    sock.onopen = function () { up(); };
-    sock.onmessage = function (ev) { onMsg(String(ev.data)); };
-    sock.onclose = function () { sock = null; down(); };
-    sock.onerror = function () { status('error de conexion (red BrazoV2?)', false); };
+    me.onopen = function () {
+      up(); retries = 0;
+      if (hub) pingT = setInterval(function () { if (me.readyState === 1) me.send('PING'); }, 20000);
+    };
+    me.onmessage = function (ev) { onMsg(String(ev.data)); };
+    me.onclose = function (ev) {
+      clearInterval(pingT); if (sock === me) sock = null; down();
+      if (ev && ev.code === 4401) status('token incorrecto', false);
+      else if (ev && ev.code === 4408) status('el hub cerro por inactividad', false);
+      if (wantHub && !(ev && ev.code === 4401) && retries < 10) {
+        retries++; status('conexion perdida, reconectando (' + retries + '/10)...', false);
+        retryT = setTimeout(function () { connect(true); }, 3000);
+      } else wantHub = false;
+    };
+    me.onerror = function () { status(hub ? 'error de conexion con el hub' : 'error de conexion (red BrazoV2?)', false); };
   }
 
   function up() { status('conectado', true); el('espBtn').textContent = 'Desconectar'; el('espCtl').style.display = ''; }
   function down() { stopMirror(); status('desconectado', false); el('espBtn').textContent = 'Conectar'; el('espCtl').style.display = 'none'; }
   function onMsg(m) {
-    if (m.indexOf('ANIMS ') === 0) buildButtons(m.slice(6).split(','));
+    if (m === 'PONG') return;
+    if (m.indexOf('TP ') === 0) {
+      var q = m.split(' ');
+      if (window.ESPVIEW) window.ESPVIEW.pose({ yaw: +q[1], th: +q[2], psi: +q[3], phi: +q[4] });
+      return;
+    }
+    if (m.indexOf('HUB ') === 0) status(m.slice(4).replace('esp32=online', 'brazo online').replace('esp32=offline', 'brazo OFFLINE'), m.indexOf('esp32=online') > 0);
+    else if (m.indexOf('ANIMS ') === 0) buildButtons(m.slice(6).split(','));
     else if (m.indexOf('ERR') === 0 || m.indexOf('STATE') === 0 || m.indexOf('DONE') === 0) status(m, true);
   }
 
@@ -63,18 +92,30 @@
   }
 
   el('espBtn').onclick = function () { (el('espVia').value === 'mqtt' ? connectMqtt : connect)(); };
+  function hubDefault() {
+    var h = location.protocol.indexOf('http') === 0 ? (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host : 'ws://localhost:8080';
+    return h + '/ws/client?role=viewer';
+  }
   el('espVia').onchange = function () {
-    var m = this.value === 'mqtt';
-    el('espMq').style.display = m ? '' : 'none';
-    el('espUrl').value = m ? 'wss://mqtt.aquicreamos.com' : 'ws://192.168.4.1:81';
+    var v = this.value;
+    el('espMq').style.display = v === 'mqtt' ? '' : 'none';
+    el('espHub').style.display = v === 'hub' ? '' : 'none';
+    el('espUrl').value = v === 'mqtt' ? 'wss://mqtt.aquicreamos.com' : v === 'hub' ? hubDefault() : 'ws://192.168.4.1:81';
     status('desconectado', false);
   };
+  el('espVia').onchange();
   el('espMirror').onchange = function () { mirror = this.checked; lastPose = ''; };
   el('espStop').onclick = function () { stopMirror(); send('STOP'); };
   el('espHome').onclick = function () { stopMirror(); send('HOME'); };
+  el('espOff').onclick = function () { stopMirror(); send('OFF'); };
   el('espTour').onclick = function () { stopMirror(); send('TOUR'); };
+  Array.prototype.forEach.call(document.querySelectorAll('.espTest'), function (b) {
+    b.onclick = function () { stopMirror(); send(b.dataset.t ? 'TEST ' + b.dataset.t : 'TEST'); };
+  });
 
   window.ESP = {
+    connected: function () { return !!((sock && sock.readyState === 1) || (mq && mq.connected)); },
+    mirrorOn: function (on) { el('espMirror').checked = on; mirror = on; lastPose = ''; },
     pose: function (p) {
       if (!mirror) return;
       var now = performance.now();

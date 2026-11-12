@@ -42,9 +42,10 @@ Y_SECT = (6.0, 9.0)
 Y_ARM_L = (-5.0, -2.0)                          # (fase 3: se corrio 3 mm para dejar paso a la biela en [-8.5,-5.5])
 
 # servo SG90 / MG90S (mismas cotas que gripper.py; verificar con calibre)
-SV_L, SV_W, SV_H = 22.8, 12.2, 22.7
-SV_TAB_L, SV_TAB_T, SV_SHAFT_FROM_END, SV_ABOVE = 32.5, 2.5, 6.0, 6.8
-TAB_INSET, GEAR_GAP = 2.4, 8.0
+SV_L, SV_W, SV_H = 25.0, 14.0, 24.5
+SV_TAB_L, SV_TAB_T, SV_SHAFT_FROM_END, SV_ABOVE = 33.0, 2.5, 6.0, 7.5
+TAB_INSET, GEAR_GAP = 2.0, 8.0
+EAR_D = 1.5
 HORN_R, HORN_D, CENTER_A = 8.0, 1.8, 7.6
 
 
@@ -158,7 +159,7 @@ def rho_at(theta, rho_ref, theta_ref=45.0):
 
 # ------------------------------------------------------------------ mejillas de la torreta (plano XZ)
 BODY_X0, BODY_X1 = -(SV_L - SV_SHAFT_FROM_END), SV_SHAFT_FROM_END
-WIN_DX = (BODY_X0 - 0.3, BODY_X1 + 0.3)
+WIN_DX = (BODY_X0 - 0.2, BODY_X1 + 0.2)
 WIN_DZ = (-SV_W / 2 - 0.3, SV_W / 2 + 0.3)
 TAB_X0 = 0.5 * (BODY_X0 + BODY_X1) - SV_TAB_L / 2
 TAB_X1 = TAB_X0 + SV_TAB_L
@@ -181,7 +182,7 @@ def brace_slot():
 
 
 def cheek_right_holes():
-    return [(0.0, H, 3.2), (Q[0] + TAB_X0 + TAB_INSET, Q[1], 2.2), (Q[0] + TAB_X1 - TAB_INSET, Q[1], 2.2)]
+    return [(0.0, H, 3.2), (Q[0] + TAB_X0 + TAB_INSET, Q[1], EAR_D), (Q[0] + TAB_X1 - TAB_INSET, Q[1], EAR_D)]
 
 
 def cheek_rects_right():
@@ -198,7 +199,7 @@ def cheek_right_window():
 
 def cheek_left_holes():
     """servo J3 coaxial con S, espejo del J2: tornillos de las orejas (la ventana va aparte)."""
-    return [(TAB_X0 + TAB_INSET, H, 2.2), (TAB_X1 - TAB_INSET, H, 2.2)]
+    return [(TAB_X0 + TAB_INSET, H, EAR_D), (TAB_X1 - TAB_INSET, H, EAR_D)]
 
 
 def cheek_left_window():

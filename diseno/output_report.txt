@@ -19,7 +19,7 @@ TRAVESANO               1    46.0 x  20.0         920            99.00          
 PARED FRONTAL           1   134.0 x  22.0        2504            99.00            99.00
 PARED TRASERA           1   134.0 x  22.0        2504             6.00            99.00
 PARED LATERAL           2   128.0 x  22.0        2408            99.00            99.00
-PLACA PINZA+CUELLO      1    63.0 x  47.0        2415             1.45             1.05  (excepcion documentada: puente servo-ventana/tornillo 1.05 mm >= 1.0)
+PLACA PINZA+CUELLO      1    63.0 x  47.0        2415             1.70             1.05  (excepcion documentada: puente servo-ventana/tornillo 1.05 mm >= 1.0)
 MANDIBULA A             2    65.3 x  29.2         850             2.59             3.32
 MANDIBULA B             2    67.1 x  29.2         849             9.63            99.00
 
