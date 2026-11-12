@@ -13,7 +13,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(os.path.dirname(HERE), "diseno"))
 import output_build as ob   # noqa: E402
 
-CORTAR = ("PLACA BRAZO IZQ", "MEJILLA DER (J2)", "MEJILLA IZQ (J3)", "TRAVESANO", "MANIVELA", "BIELA",
+CORTAR = ("PLACA BRAZO DER", "CAPA SECTOR", "PINON", "PLACA BRAZO IZQ", "MEJILLA DER (J2)", "MEJILLA IZQ (J3)", "TRAVESANO", "MANIVELA", "BIELA",
           "ANTEBRAZO IZQ", "ANTEBRAZO DER", "PLACA PINZA+CUELLO")
 
 
